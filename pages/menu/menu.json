@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "每日点菜",
+  "enablePullDownRefresh": true,
+  "navigationBarBackgroundColor": "#FFFCF7",
+  "navigationBarTextStyle": "black"
+}

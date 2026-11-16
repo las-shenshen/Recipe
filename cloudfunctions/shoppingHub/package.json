@@ -1,0 +1,7 @@
+{
+  "name": "shopping-hub",
+  "version": "1.0.0",
+  "description": "所有小程序用户共同编辑的买菜清单",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "2.6.3" }
+}

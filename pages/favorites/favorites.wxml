@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="eyebrow">FAMILY RECIPE BOOK</view>
+  <view class="title">收藏的味道<text>。</text></view>
+  <view wx:if="{{!cloudEnabled}}" class="cloud-hint">开启云开发后，可以和家人一起浏览收藏</view>
+  <view wx:if="{{syncError}}" class="cloud-hint warning">云端暂时不可用，当前显示本机收藏</view>
+  <view class="mode-tabs">
+    <view class="mode-tab {{mode === 'all' ? 'active' : ''}}" data-mode="all" bindtap="selectMode">大家都在收藏</view>
+    <view class="mode-tab {{mode === 'mine' ? 'active' : ''}}" data-mode="mine" bindtap="selectMode">我收藏的</view>
+  </view>
+  <view wx:if="{{filteredRecipes.length}}" class="list">
+    <view wx:for="{{filteredRecipes}}" wx:key="id" class="row" data-id="{{item.id}}" bindtap="openRecipe">
+      <view class="art" style="background:{{item.color}}">{{item.emoji}}</view>
+      <view class="info">
+        <text class="name">{{item.name}}</text>
+        <view class="person-line"><image wx:if="{{item.authorAvatar}}" class="avatar" src="{{item.authorAvatar}}" mode="aspectFill"/><view wx:else class="avatar fallback">🍳</view><text>作者 · {{item.authorName}}</text></view>
+        <view class="collectors" wx:if="{{item.favoriteUsers.length}}">
+          <view class="collector" wx:for="{{item.favoriteUsers}}" wx:for-item="user" wx:key="nickname"><image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill"/><view wx:else class="avatar fallback">♥</view><text>{{user.nickname}}</text></view>
+          <text class="count">{{item.favoriteCount}} 人收藏</text>
+        </view>
+        <text class="caption">{{item.description}}</text>
+      </view>
+      <view class="favorite-action" catchtap="toggleFavorite" data-id="{{item.id}}">{{item.favorite ? '♥' : '♡'}}</view>
+    </view>
+  </view>
+  <view wx:else class="empty"><text class="empty-heart">♡</text><text>{{mode === 'mine' ? '你还没有收藏菜谱' : '暂时还没有人收藏菜谱'}}</text><view bindtap="goRecipes">去菜谱里看看 →</view></view>
+</view>

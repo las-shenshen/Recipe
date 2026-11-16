@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="eyebrow">FAMILY RECIPE BOOK</view>
+  <view class="heading"><text class="title">全部菜谱</text><view class="add" bindtap="goAdd">＋ 记一道</view></view>
+  <view class="search"><text>⌕</text><input placeholder="搜菜名或食材" value="{{keyword}}" bindinput="onSearch"/></view>
+  <view wx:if="{{!cloudEnabled}}" class="cloud-hint">开启云开发后，菜谱和收藏可以在家人之间共享</view>
+  <view wx:if="{{syncError}}" class="cloud-hint warning">云端暂时不可用，当前显示本机已保存的菜谱</view>
+  <view class="category-heading"><text>菜谱分类</text><view class="category-tools"><view class="category-tool add-category" bindtap="addCategory">＋ 分类</view><view class="category-tool" bindtap="toggleCategoryManage">{{categoryManage ? '完成' : '管理'}}</view></view></view>
+  <scroll-view class="category-scroll" scroll-x show-scrollbar="false">
+    <view class="category-tabs">
+      <view wx:for="{{categoryTabs}}" wx:key="name" class="category-chip {{item.selected ? 'selected' : ''}} {{categoryManage ? 'managing' : ''}}" data-category="{{item.name}}" bindtap="selectCategory"><text>{{item.name}}</text><text wx:if="{{categoryManage && item.deletable}}" class="category-remove" data-category="{{item.name}}" catchtap="removeCategory">×</text></view>
+    </view>
+  </scroll-view>
+  <view class="list">
+    <view wx:for="{{filteredRecipes}}" wx:key="id" class="swipe-shell {{activeSwipeId === item.id ? 'opened' : ''}}" data-id="{{item.id}}" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
+      <view wx:if="{{item.isMine || !item.isCloud}}" class="swipe-actions">
+        <view class="swipe-edit" data-id="{{item.id}}" catchtap="editRecipe">编辑</view>
+        <view class="swipe-delete" data-id="{{item.id}}" catchtap="deleteRecipe">删除</view>
+      </view>
+      <view wx:else class="swipe-actions single-action">
+        <view class="swipe-favorite" data-id="{{item.id}}" catchtap="toggleFavorite">{{item.favorite ? '取消收藏' : '收藏'}}</view>
+      </view>
+      <view class="row" data-id="{{item.id}}" bindtap="openRecipe">
+        <view class="art" style="background:{{item.color}}">{{item.emoji}}</view>
+        <view class="info"><text class="name">{{item.name}}</text><view class="author-line"><image wx:if="{{item.authorAvatar}}" class="author-avatar" src="{{item.authorAvatar}}" mode="aspectFill"/><view wx:else class="author-avatar avatar-fallback">🍳</view><text>{{item.authorName}}</text></view><text class="caption">{{item.category}} · {{item.difficulty}}</text></view>
+        <text class="time">{{item.time}} 分钟　›</text>
+      </view>
+    </view>
+    <view wx:if="{{!filteredRecipes.length}}" class="empty">没有找到这类菜谱，试试其他分类吧。</view>
+  </view>
+  <view class="note">把每一顿喜欢的饭，留在这里。</view>
+</view>

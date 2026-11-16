@@ -1,0 +1,7 @@
+{
+  "name": "menu-hub",
+  "version": "1.0.0",
+  "description": "所有用户可共同编辑的点菜菜单",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "2.6.3" }
+}

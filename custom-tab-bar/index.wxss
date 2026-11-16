@@ -1,0 +1,4 @@
+.tabbar { position:fixed; left:0; right:0; bottom:0; z-index:99; height:calc(100rpx + env(safe-area-inset-bottom)); padding:0 14rpx env(safe-area-inset-bottom); box-sizing:border-box; display:flex; align-items:center; justify-content:space-around; background:#FFFCF7; border-top:1rpx solid #EEE5D8; }
+.tab { min-width:90rpx; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:5rpx; color:#8E7D6D; font-size:20rpx; }
+.tab.active { color:#E5764A; }
+.icon { font-size:29rpx; line-height:1; }

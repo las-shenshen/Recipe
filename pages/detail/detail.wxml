@@ -1,0 +1,10 @@
+<view class="page" wx:if="{{recipe}}">
+  <view class="cover" style="background:{{recipe.color}}"><text class="food">{{recipe.emoji}}</text><view class="plate"></view><view class="cover-label">家里的味道 · {{recipe.category}}</view></view>
+  <view class="content"><view class="title-row"><view><text class="title">{{recipe.name}}</text><text class="desc">{{recipe.description}}</text></view><view class="favorite {{recipe.favorite?'on':''}}" bindtap="toggleFavorite">{{recipe.favorite?'♥':'♡'}}</view></view>
+    <view class="author-row"><image wx:if="{{recipe.authorAvatar}}" class="author-avatar" src="{{recipe.authorAvatar}}" mode="aspectFill"/><view wx:else class="author-avatar author-fallback">🍳</view><text>分享者 · {{recipe.authorName || '家庭菜谱'}}</text></view>
+    <view class="facts"><view><text class="fact-icon">◷</text><text>{{recipe.time}} 分钟</text></view><view><text class="fact-icon">♧</text><text>{{recipe.servings}} 人份</text></view><view><text class="fact-icon">✳</text><text>{{recipe.difficulty}}</text></view></view>
+    <view class="section"><view class="section-title">准备食材 <text>{{recipe.ingredients.length}} 种</text></view><view class="ingredient" wx:for="{{recipe.ingredients}}" wx:key="name"><text class="ingredient-name">{{item.name}}</text><text class="amount">{{item.amount}}</text></view><view class="set-picker"><view class="set-copy"><text>采买几套</text><text>每套约 {{recipe.servings}} 人份</text></view><view class="stepper"><view class="step-button" bindtap="decreaseSets">−</view><text>{{sets}}</text><view class="step-button" bindtap="increaseSets">＋</view></view></view><view class="add-list" bindtap="addIngredients">＋ 加入采购清单 · {{sets}} 套</view></view>
+    <view class="section steps-section"><view class="section-title">做法步骤 <text>{{recipe.steps.length}} 步</text></view><view class="step" wx:for="{{recipe.steps}}" wx:key="index"><view class="step-no">{{index+1}}</view><text>{{item}}</text></view></view>
+    <view class="endnote">慢慢做，用心吃 <text>✳</text></view>
+  </view>
+</view>

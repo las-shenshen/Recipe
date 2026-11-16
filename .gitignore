@@ -1,0 +1,19 @@
+# 依赖
+node_modules/
+miniprogram_npm/
+
+# 微信开发者工具的个人本地配置（每位开发者不同，不纳入版本库）
+project.private.config.json
+
+# 云函数依赖与本地调试产物
+cloudfunctions/**/node_modules/
+cloudfunctions/**/package-lock.json
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db
+
+# 测试与构建产物
+coverage/
+dist/
