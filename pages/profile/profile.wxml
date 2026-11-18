@@ -7,9 +7,9 @@
 
   <view wx:if="{{!loggedIn}}" class="welcome-panel">
     <view class="welcome-art">
-      <view class="art-leaf leaf-left">✳</view>
-      <view class="art-plate"><view class="plate-center">家</view><view class="plate-leaf">✦</view></view>
-      <view class="art-leaf leaf-right">✿</view>
+      <view class="art-leaf leaf-left">🌿</view>
+      <view class="art-plate"><view class="plate-center">家</view></view>
+      <view class="art-leaf leaf-right">🍅</view>
     </view>
     <text class="welcome-title">让每一餐，都有家的味道</text>
     <text class="welcome-copy">用微信快速登录，跨设备同步你的菜谱和收藏</text>
@@ -26,7 +26,7 @@
       <button wx:if="{{editing}}" class="avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" aria-label="更换头像">
         <image wx:if="{{avatarTempPath || (profile.avatarUrl && !avatarBroken)}}" class="avatar" src="{{avatarTempPath || profile.avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
         <view wx:else class="avatar avatar-placeholder">家</view>
-        <view class="avatar-edit">✎</view>
+        <view class="avatar-edit">📷</view>
       </button>
       <image wx:elif="{{profile.avatarUrl && !avatarBroken}}" class="avatar" src="{{profile.avatarUrl}}" mode="aspectFill" binderror="onAvatarError" />
       <view wx:else class="avatar avatar-placeholder">家</view>
@@ -35,7 +35,7 @@
         <text wx:else class="account-name">{{profile.nickname || '微信用户'}}</text>
         <text class="account-hint">{{editing ? '点头像更换 · 昵称最多 30 字' : '微信账号 · 菜谱和收藏已同步'}}</text>
       </view>
-      <button wx:if="{{!editing}}" class="edit-button" bindtap="editProfile" aria-label="编辑个人资料">✎</button>
+      <button wx:if="{{!editing}}" class="edit-button" bindtap="editProfile" aria-label="编辑个人资料">编辑</button>
     </view>
     <view wx:if="{{editing}}" class="edit-actions">
       <button class="cancel-button" bindtap="cancelEdit">取消</button>
@@ -45,10 +45,10 @@
 
   <view class="section-title"><text>厨房里的日常</text><text class="section-note">一触即达</text></view>
   <view class="shortcut-list">
-    <view class="shortcut-row" bindtap="goFavorites"><view class="shortcut-icon favorites-icon">♡</view><view class="shortcut-copy"><text class="shortcut-name">我的收藏</text><text class="shortcut-detail">常做的菜，随时找得到</text></view><text class="shortcut-arrow">›</text></view>
-    <view class="shortcut-row" bindtap="goRecipes"><view class="shortcut-icon recipes-icon">▤</view><view class="shortcut-copy"><text class="shortcut-name">家庭菜谱</text><text class="shortcut-detail">看看今天有什么灵感</text></view><text class="shortcut-arrow">›</text></view>
-    <view class="shortcut-row" bindtap="goMenu"><view class="shortcut-icon menu-icon">♨</view><view class="shortcut-copy"><text class="shortcut-name">一周点菜</text><text class="shortcut-detail">和家人一起安排三餐</text></view><text class="shortcut-arrow">›</text></view>
-    <view class="shortcut-row" bindtap="goShopping"><view class="shortcut-icon shopping-icon">☷</view><view class="shortcut-copy"><text class="shortcut-name">买菜清单</text><text class="shortcut-detail">采购要买的食材</text></view><text class="shortcut-arrow">›</text></view>
+    <view class="shortcut-row" bindtap="goFavorites"><view class="shortcut-icon favorites-icon">❤️</view><view class="shortcut-copy"><text class="shortcut-name">我的收藏</text><text class="shortcut-detail">常做的菜，随时找得到</text></view><view class="shortcut-arrow"></view></view>
+    <view class="shortcut-row" bindtap="goRecipes"><view class="shortcut-icon recipes-icon">📖</view><view class="shortcut-copy"><text class="shortcut-name">家庭菜谱</text><text class="shortcut-detail">看看今天有什么灵感</text></view><view class="shortcut-arrow"></view></view>
+    <view class="shortcut-row" bindtap="goMenu"><view class="shortcut-icon menu-icon">🍲</view><view class="shortcut-copy"><text class="shortcut-name">一周点菜</text><text class="shortcut-detail">和家人一起安排三餐</text></view><view class="shortcut-arrow"></view></view>
+    <view class="shortcut-row" bindtap="goShopping"><view class="shortcut-icon shopping-icon">🧺</view><view class="shortcut-copy"><text class="shortcut-name">买菜清单</text><text class="shortcut-detail">采购要买的食材</text></view><view class="shortcut-arrow"></view></view>
   </view>
 
   <button wx:if="{{loggedIn}}" class="logout-button" bindtap="logout">退出微信登录</button>

@@ -1,11 +1,64 @@
 <view class="page" style="padding-top:{{safeTop}}px">
   <view class="date-line">{{dayLabel}} · 晚餐灵感</view>
-  <view class="topline"><text class="headline">今晚吃点什么？</text><view class="home-badge" bindtap="goProfile"><image wx:if="{{loggedIn && profile.avatarUrl}}" src="{{profile.avatarUrl}}" mode="aspectFill"/><text wx:else class="home-badge-icon">{{loggedIn ? '👤' : '🏡'}}</text><text class="home-badge-label">{{loggedIn ? (profile.nickname || '已登录') : '微信登录'}}</text></view></view>
-  <view class="search"><text class="search-icon">⌕</text><input placeholder="搜菜名、食材，或家里现有的东西" value="{{keyword}}" bindinput="onSearch" confirm-type="search"/><text wx:if="{{keyword}}" class="clear" bindtap="clearSearch">×</text></view>
-  <view class="hero" bindtap="openRecipe" data-id="{{featured.id}}"><view class="hero-copy"><text class="hero-tag">本周家常菜</text><text class="hero-title">{{featured.name}}</text><text class="hero-subtitle">暖胃又下饭</text><view class="hero-cta">看做法 <text>→</text></view></view><view class="hero-dish"><text>🍲</text></view></view>
-  <view class="section-head"><text class="section-title">按口味找菜</text><view class="section-link" bindtap="goRecipes">全部分类 <text>→</text></view></view>
-  <scroll-view scroll-x class="category-scroll" show-scrollbar="false"><view class="categories"><view wx:for="{{categories}}" wx:key="*this" class="category {{activeCategory === item ? 'active' : ''}}" data-category="{{item}}" bindtap="selectCategory">{{item}}</view></view></scroll-view>
-  <view class="section-head recipe-heading"><text class="section-title">家里常做</text><view class="section-link" bindtap="goRecipes">全部菜谱</view></view>
-  <view class="recipe-list"><view wx:for="{{filteredRecipes}}" wx:key="id" class="recipe-row" data-id="{{item.id}}" bindtap="openRecipe"><view class="recipe-art" style="background:{{item.color}}"><text>{{item.emoji}}</text></view><view class="recipe-info"><text class="recipe-name">{{item.name}}</text><view class="recipe-author"><image wx:if="{{item.authorAvatar}}" src="{{item.authorAvatar}}" mode="aspectFill"/><view wx:else class="author-fallback">🍳</view><text>{{item.authorName}}</text></view><text class="recipe-caption">{{item.description}}</text></view><text class="recipe-time">{{item.time}} 分钟</text><text class="heart {{item.favorite ? 'liked' : ''}}" catchtap="toggleFavorite" data-id="{{item.id}}">{{item.favorite ? '♥' : ''}}</text></view></view>
-  <view wx:if="{{filteredRecipes.length === 0}}" class="empty"><text>还没有找到这道菜</text><view bindtap="goAdd">记下这道菜 →</view></view>
+  <view class="topline">
+    <text class="headline">今晚吃点什么？</text>
+    <view class="home-badge" bindtap="goProfile">
+      <image wx:if="{{loggedIn && profile.avatarUrl}}" src="{{profile.avatarUrl}}" mode="aspectFill"/>
+      <view wx:else class="home-badge-icon">{{loggedIn ? '👤' : '🏡'}}</view>
+      <text class="home-badge-label">{{loggedIn ? (profile.nickname || '已登录') : '微信登录'}}</text>
+    </view>
+  </view>
+
+  <view class="search">
+    <view class="icon-search"></view>
+    <input placeholder="搜菜名、食材，或家里现有的东西" value="{{keyword}}" bindinput="onSearch" confirm-type="search"/>
+    <view wx:if="{{keyword}}" class="clear" bindtap="clearSearch">×</view>
+  </view>
+
+  <view wx:if="{{featured.id}}" class="hero" bindtap="openRecipe" data-id="{{featured.id}}">
+    <view class="hero-copy">
+      <text class="hero-tag">本周家常菜</text>
+      <view class="hero-title">{{featured.name}}</view>
+      <text class="hero-subtitle">{{featured.time}} 分钟 · {{featured.category}}</text>
+      <view class="hero-cta">看做法 <text>→</text></view>
+    </view>
+    <view class="hero-dish"><text>{{featured.emoji || '🍲'}}</text></view>
+  </view>
+
+  <view class="section-head">
+    <text class="section-title">按口味找菜</text>
+    <view class="section-link" bindtap="goRecipes">全部分类 <text>→</text></view>
+  </view>
+  <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="category-scroll">
+    <view class="categories">
+      <view wx:for="{{categories}}" wx:key="*this" class="category {{activeCategory === item ? 'active' : ''}}" data-category="{{item}}" bindtap="selectCategory">{{item}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="section-head recipe-heading">
+    <text class="section-title">家里常做</text>
+    <view class="section-link" bindtap="goRecipes">全部菜谱 <text>→</text></view>
+  </view>
+  <view class="recipe-list">
+    <view wx:for="{{filteredRecipes}}" wx:key="id" class="recipe-row" data-id="{{item.id}}" bindtap="openRecipe">
+      <view class="recipe-art" style="background:{{item.color}}"><text>{{item.emoji}}</text></view>
+      <view class="recipe-info">
+        <text class="recipe-name">{{item.name}}</text>
+        <text class="recipe-caption">{{item.description}}</text>
+        <view class="recipe-meta">
+          <image wx:if="{{item.authorAvatar}}" src="{{item.authorAvatar}}" mode="aspectFill"/>
+          <view wx:else class="author-fallback">🍳</view>
+          <text class="author-name">{{item.authorName}}</text>
+          <text>·</text>
+          <text class="recipe-time">{{item.time}} 分钟</text>
+        </view>
+      </view>
+      <view class="heart {{item.favorite ? 'liked' : ''}}" catchtap="toggleFavorite" data-id="{{item.id}}">{{item.favorite ? '♥' : '♡'}}</view>
+    </view>
+  </view>
+  <view wx:if="{{filteredRecipes.length === 0}}" class="empty">
+    <text class="empty-icon">🍽️</text>
+    <text>还没有找到这道菜</text>
+    <view class="empty-action" bindtap="goAdd">记下这道菜 →</view>
+  </view>
 </view>

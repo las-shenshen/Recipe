@@ -1,9 +1,48 @@
-.page { padding-bottom:40rpx; }.cover { height:430rpx;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center; }.food { font-size:190rpx;z-index:1;filter:drop-shadow(0 18rpx 14rpx #55452b33); }.plate { position:absolute;width:350rpx;height:350rpx;border-radius:50%;border:18rpx solid #fff9; }.cover-label { position:absolute;bottom:25rpx;left:36rpx;color:#746C5F;font-size:21rpx; }.content { padding:0 36rpx; }.title-row { display:flex;justify-content:space-between;align-items:flex-start;margin-top:32rpx; }.title-row>view:first-child { display:flex;flex-direction:column; }.title { font-family:serif;font-size:43rpx;font-weight:700; }.desc { color:#928C81;font-size:23rpx;line-height:1.7;margin-top:12rpx; }.favorite { width:65rpx;height:65rpx;border-radius:50%;background:#F7F2EB;text-align:center;line-height:65rpx;font-size:39rpx;color:#989084;flex-shrink:0; }.favorite.on { color:#E5764A;background:#F9EAE1; }.facts { display:flex;justify-content:space-around;background:#F7F4ED;border-radius:18rpx;padding:22rpx 8rpx;margin-top:30rpx;color:#766F63;font-size:21rpx; }.facts view { display:flex;align-items:center;gap:10rpx; }.fact-icon { color:#DE8059;font-size:27rpx; }.section { margin-top:39rpx; }.section-title { font-size:30rpx;font-weight:700;margin-bottom:19rpx; }.section-title text { color:#B3AA9B;font-size:19rpx;font-weight:400;margin-left:10rpx; }.ingredient { padding:19rpx 4rpx;border-bottom:1rpx solid #F0EDE6;display:flex;justify-content:space-between;font-size:24rpx; }.ingredient-name { color:#47443E; }.amount { color:#9D968B; }.add-list { margin-top:19rpx;text-align:center;padding:18rpx;border-radius:14rpx;background:#F9EEE7;color:#D8754C;font-size:22rpx; }.step { display:flex;gap:17rpx;margin:24rpx 0;align-items:flex-start;font-size:24rpx;line-height:1.75;color:#57534B; }.step-no { width:43rpx;height:43rpx;border-radius:50%;background:#F8E9DD;color:#D9774E;line-height:43rpx;text-align:center;font-weight:700;flex-shrink:0; }.endnote { text-align:center;margin:48rpx 0 10rpx;color:#B4AC9F;font-size:20rpx; }.endnote text { color:#DE8059; }
-.set-picker { display:flex; justify-content:space-between; align-items:center; margin-top:25rpx; padding:19rpx 4rpx; border-top:1rpx solid #F0EDE6; }
-.set-copy { display:flex; flex-direction:column; gap:6rpx; font-size:22rpx; font-weight:600; color:#4C4942; }
-.set-copy text+text { color:#A29A8D; font-size:18rpx; font-weight:400; }
-.stepper { display:flex; align-items:center; gap:20rpx; color:#514B42; font-size:24rpx; }
-.step-button { width:54rpx; height:54rpx; border-radius:50%; display:flex; justify-content:center; align-items:center; background:#F6EEE4; color:#D8754C; font-size:30rpx; }
-.author-row { display:flex; align-items:center; gap:9rpx; margin-top:15rpx; color:#958575; font-size:20rpx; }
-.author-avatar { width:34rpx; height:34rpx; border-radius:50%; flex-shrink:0; }
-.author-fallback { display:flex; align-items:center; justify-content:center; background:#F4EBDD; font-size:20rpx; }
+.page { padding-bottom:calc(48rpx + env(safe-area-inset-bottom)); }
+
+/* 封面：底部 40rpx 被内容区的圆角盖住，所以盘子和菜整体上移 20rpx */
+.cover { position:relative; overflow:hidden; height:480rpx; padding-bottom:40rpx; box-sizing:border-box; display:flex; align-items:center; justify-content:center; }
+.plate { position:absolute; left:50%; top:50%; width:360rpx; height:360rpx; margin:-200rpx 0 0 -180rpx; box-sizing:border-box; border:20rpx solid rgba(255,255,255,.6); border-radius:50%; background:rgba(255,255,255,.28); }
+.food { position:relative; z-index:1; font-size:200rpx; line-height:1; filter:drop-shadow(0 18rpx 14rpx rgba(85,69,43,.2)); }
+.cover-label { position:absolute; left:32rpx; bottom:64rpx; z-index:1; padding:8rpx 20rpx; border-radius:999rpx; background:rgba(255,252,247,.72); color:var(--ink-2); font-size:24rpx; }
+
+.content { position:relative; z-index:2; margin-top:-40rpx; padding:40rpx 32rpx 0; border-radius:40rpx 40rpx 0 0; background:var(--paper); }
+.title-row { display:flex; align-items:flex-start; justify-content:space-between; gap:24rpx; }
+.title-copy { min-width:0; display:flex; flex-direction:column; }
+.title { font-family:var(--serif); font-size:52rpx; line-height:1.3; font-weight:700; }
+.desc { margin-top:12rpx; color:var(--ink-2); font-size:28rpx; line-height:1.7; }
+.favorite { flex:none; width:88rpx; height:88rpx; border-radius:50%; background:var(--fill); color:var(--ink-3); text-align:center; line-height:88rpx; font-size:48rpx; }
+.favorite.on { background:var(--accent-soft); color:var(--accent); }
+.author-row { display:flex; align-items:center; gap:12rpx; margin-top:20rpx; color:var(--ink-3); font-size:26rpx; }
+.author-avatar { flex:none; width:44rpx; height:44rpx; border-radius:50%; }
+.author-fallback { background:var(--fill); text-align:center; line-height:44rpx; font-size:24rpx; }
+
+.facts { display:flex; margin-top:32rpx; padding:28rpx 0; border-radius:28rpx; background:var(--fill); }
+.fact { flex:1; display:flex; flex-direction:column; align-items:center; gap:4rpx; border-left:1rpx solid #E6DCCD; }
+.fact:first-child { border-left:0; }
+.fact-value { font-size:32rpx; font-weight:600; }
+.fact-label { color:var(--ink-3); font-size:24rpx; }
+
+.section { margin-top:56rpx; }
+.section-title { margin-bottom:20rpx; font-family:var(--serif); font-size:38rpx; font-weight:700; }
+.section-title text { margin-left:12rpx; color:var(--ink-3); font-family:var(--sans); font-size:24rpx; font-weight:400; }
+
+/* 食材与采买 */
+.ingredient-card { padding:0 28rpx; border:1rpx solid var(--line); border-radius:28rpx; background:var(--card); box-shadow:var(--shadow-card); }
+.ingredient { display:flex; align-items:baseline; justify-content:space-between; gap:24rpx; padding:24rpx 0; border-bottom:1rpx solid var(--line); font-size:30rpx; }
+.ingredient:last-child { border-bottom:0; }
+.amount { flex:none; color:var(--ink-3); font-size:28rpx; }
+.buy-panel { margin-top:24rpx; padding:28rpx; border-radius:28rpx; background:var(--fill); }
+.set-picker { display:flex; align-items:center; justify-content:space-between; gap:20rpx; }
+.set-copy { display:flex; flex-direction:column; gap:2rpx; font-size:30rpx; font-weight:600; }
+.set-copy text+text { color:var(--ink-3); font-size:24rpx; font-weight:400; }
+.stepper { flex:none; display:flex; align-items:center; gap:8rpx; }
+.set-count { min-width:64rpx; text-align:center; font-size:34rpx; font-weight:600; }
+.step-button { width:72rpx; height:72rpx; border-radius:50%; background:var(--card); color:var(--accent); text-align:center; line-height:68rpx; font-size:40rpx; }
+.add-list { margin-top:24rpx; padding:26rpx; border-radius:var(--radius-control); background:var(--accent); color:#FFF; text-align:center; font-size:30rpx; font-weight:600; box-shadow:0 12rpx 28rpx rgba(224,108,62,.24); }
+
+/* 做法 */
+.step { display:flex; align-items:flex-start; gap:24rpx; margin-top:32rpx; font-size:30rpx; line-height:1.75; }
+.step-no { flex:none; width:56rpx; height:56rpx; border-radius:50%; background:var(--accent-soft); color:var(--accent-deep); text-align:center; line-height:56rpx; font-family:var(--serif); font-size:28rpx; font-weight:700; }
+.step-text { flex:1; min-width:0; }
+.endnote { margin-top:72rpx; color:var(--ink-3); font-size:24rpx; text-align:center; }

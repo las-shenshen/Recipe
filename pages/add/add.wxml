@@ -1,9 +1,48 @@
-<view class="page"><view class="intro"><text class="eyebrow">FAMILY RECIPE BOOK</text><text class="title" wx:if="{{!isEditing}}">把喜欢的味道，<text>记下来。</text></text><text class="title" wx:else>修改这道菜，<text>留住好味道。</text></text><text class="subtitle">{{isEditing ? '菜名、食材和做法都可以调整。' : '家传的小窍门，也值得认真收藏。'}}</text></view>
-  <view class="form-card"><view class="field"><text class="label">菜名 <text>*</text></text><input placeholder="比如：外婆的红烧肉" value="{{name}}" data-field="name" bindinput="onInput" maxlength="20"/></view>
-  <view class="field"><text class="label">分类</text><picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategory"><view class="picker-value">{{categories[categoryIndex]}} <text>⌄</text></view></picker></view>
-  <view class="field"><text class="label">一句介绍</text><textarea placeholder="这道菜有什么特别之处？" value="{{description}}" data-field="description" bindinput="onInput" maxlength="80" auto-height/></view>
-  <view class="row"><view class="field half"><text class="label">用时（分钟）</text><input type="number" placeholder="30" value="{{time}}" data-field="time" bindinput="onInput"/></view><view class="field half"><text class="label">几人份</text><input type="number" placeholder="2" value="{{servings}}" data-field="servings" bindinput="onInput"/></view></view>
-  <view class="field"><view class="label-row"><text class="label">食材清单</text><text class="inline-action" bindtap="addIngredient">＋ 添加食材</text></view><view class="ingredient-row" wx:for="{{ingredients}}" wx:key="index"><input placeholder="食材" value="{{item.name}}" data-index="{{index}}" data-key="name" bindinput="onIngredientInput"/><input placeholder="用量" value="{{item.amount}}" data-index="{{index}}" data-key="amount" bindinput="onIngredientInput"/><text class="remove" data-index="{{index}}" bindtap="removeIngredient">×</text></view></view>
-  <view class="field"><view class="label-row"><text class="label">烹饪步骤</text><text class="inline-action" bindtap="addStep">＋ 添加步骤</text></view><view class="step-row" wx:for="{{steps}}" wx:key="index"><text class="step-index">{{index+1}}</text><textarea placeholder="写下这一步怎么做" value="{{item}}" data-index="{{index}}" bindinput="onStepInput" auto-height/><text class="remove" data-index="{{index}}" bindtap="removeStep">×</text></view></view></view>
-  <button class="save" style="width:544rpx;margin-left:auto;margin-right:auto" bindtap="saveRecipe">{{isEditing ? '保存修改　→' : '收藏这道菜　→'}}</button><view class="footnote">仅保存在这台设备上 · 家的味道，慢慢积累</view>
+<view class="page">
+  <view class="intro">
+    <text class="eyebrow">FAMILY RECIPE BOOK</text>
+    <text class="title" wx:if="{{!isEditing}}">把喜欢的味道，<text>记下来。</text></text>
+    <text class="title" wx:else>修改这道菜，<text>留住好味道。</text></text>
+    <text class="subtitle">{{isEditing ? '菜名、食材和做法都可以调整。' : '家传的小窍门，也值得认真收藏。'}}</text>
+  </view>
+
+  <view class="form-card">
+    <view class="field">
+      <text class="label">菜名 <text>*</text></text>
+      <input class="text-input" placeholder="比如：外婆的红烧肉" value="{{name}}" data-field="name" bindinput="onInput" maxlength="20"/>
+    </view>
+    <view class="field">
+      <text class="label">分类</text>
+      <picker mode="selector" range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategory">
+        <view class="picker-value"><text>{{categories[categoryIndex]}}</text><view class="icon-chevron-down"></view></view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">一句介绍</text>
+      <view class="textarea-box"><textarea placeholder="这道菜有什么特别之处？" value="{{description}}" data-field="description" bindinput="onInput" maxlength="80" auto-height/></view>
+    </view>
+    <view class="row">
+      <view class="field half"><text class="label">用时（分钟）</text><input class="text-input" type="number" placeholder="30" value="{{time}}" data-field="time" bindinput="onInput"/></view>
+      <view class="field half"><text class="label">几人份</text><input class="text-input" type="number" placeholder="2" value="{{servings}}" data-field="servings" bindinput="onInput"/></view>
+    </view>
+    <view class="field">
+      <view class="label-row"><text class="label">食材清单</text><text class="inline-action" bindtap="addIngredient">＋ 添加食材</text></view>
+      <view class="ingredient-row" wx:for="{{ingredients}}" wx:key="index">
+        <input class="text-input" placeholder="食材" value="{{item.name}}" data-index="{{index}}" data-key="name" bindinput="onIngredientInput"/>
+        <input class="text-input amount-input" placeholder="用量" value="{{item.amount}}" data-index="{{index}}" data-key="amount" bindinput="onIngredientInput"/>
+        <view class="remove" data-index="{{index}}" bindtap="removeIngredient">×</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="label-row"><text class="label">烹饪步骤</text><text class="inline-action" bindtap="addStep">＋ 添加步骤</text></view>
+      <view class="step-row" wx:for="{{steps}}" wx:key="index">
+        <text class="step-index">{{index+1}}</text>
+        <textarea placeholder="写下这一步怎么做" value="{{item}}" data-index="{{index}}" bindinput="onStepInput" auto-height/>
+        <view class="remove" data-index="{{index}}" bindtap="removeStep">×</view>
+      </view>
+    </view>
+  </view>
+
+  <button class="save" style="width:100%" bindtap="saveRecipe">{{isEditing ? '保存修改　→' : '收藏这道菜　→'}}</button>
+  <view class="footnote">仅保存在这台设备上 · 家的味道，慢慢积累</view>
 </view>

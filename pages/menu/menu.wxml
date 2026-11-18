@@ -1,15 +1,18 @@
 <view class="page">
   <view class="eyebrow">MEAL PLANNER</view>
   <view class="heading">
-    <view><text class="title">每日点菜</text><text class="subtitle">大家共享一份菜单 · 人人都能编辑</text></view>
+    <view class="heading-copy"><text class="title">每日点菜</text><text class="subtitle">大家共享一份菜单 · 人人都能编辑</text></view>
     <view class="planned-badge">{{plannedCount}} 份</view>
   </view>
 
   <view class="sync-status {{syncError ? 'sync-error' : ''}}" bindtap="refreshMenus">
     <text>{{saving ? '正在保存修改…' : (syncing ? '正在同步共享菜单…' : (syncError ? '同步未成功，点击重试' : '共享菜单 · 每 10 秒自动同步'))}}</text>
-    <text wx:if="{{!saving && !syncing}}">↻</text>
+    <text wx:if="{{!saving && !syncing}}" class="sync-action">刷新</text>
   </view>
-  <view wx:if="{{hasLegacyPlan}}" class="legacy-import" bindtap="importLegacyPlan">共享本机旧安排 <text>合并当天未共享的菜品 →</text></view>
+  <view wx:if="{{hasLegacyPlan}}" class="legacy-import" bindtap="importLegacyPlan">
+    <text class="legacy-title">共享本机旧安排</text>
+    <text class="legacy-detail">合并当天未共享的菜品 →</text>
+  </view>
 
   <view class="mode-switch">
     <view class="mode-option {{!weekView ? 'mode-active' : ''}}" data-view="day" bindtap="switchView">安排三餐</view>
@@ -17,20 +20,36 @@
   </view>
 
   <view wx:if="{{!weekView}}" class="date-card">
-    <view class="date-arrow" data-offset="-1" bindtap="shiftDate">‹</view>
+    <view class="date-arrow arrow-prev" data-offset="-1" bindtap="shiftDate"></view>
     <picker mode="date" value="{{selectedDate}}" start="2020-01-01" end="2035-12-31" bindchange="selectDate">
-      <view class="date-center"><text class="date-main">{{dateLabel}}</text><text class="date-value">{{selectedDate}}　⌄</text></view>
+      <view class="date-center">
+        <text class="date-main">{{dateLabel}}</text>
+        <view class="date-value"><text>{{selectedDate}}</text><view class="icon-chevron-down"></view></view>
+      </view>
     </picker>
-    <view class="date-arrow" data-offset="1" bindtap="shiftDate">›</view>
+    <view class="date-arrow arrow-next" data-offset="1" bindtap="shiftDate"></view>
   </view>
 
-  <view wx:if="{{weekView}}" class="week-navigation"><view class="date-arrow" data-offset="-7" bindtap="shiftWeek">‹</view><text>{{weekRange}}</text><view class="date-arrow" data-offset="7" bindtap="shiftWeek">›</view></view>
-  <scroll-view class="week-strip" scroll-x show-scrollbar="false">
-    <view class="week-days"><view wx:for="{{weekDays}}" wx:key="date" class="week-day {{item.selected ? 'week-day-selected' : ''}}" data-date="{{item.date}}" bindtap="selectWeekDay"><text class="weekday-text">{{item.weekday}}</text><text class="week-day-number">{{item.day}}</text><view class="eaten-dot" wx:if="{{item.eatenCount}}"></view></view></view>
+  <view wx:if="{{weekView}}" class="week-navigation">
+    <view class="date-arrow arrow-prev" data-offset="-7" bindtap="shiftWeek"></view>
+    <text>{{weekRange}}</text>
+    <view class="date-arrow arrow-next" data-offset="7" bindtap="shiftWeek"></view>
+  </view>
+  <scroll-view class="week-strip" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="week-days">
+      <view wx:for="{{weekDays}}" wx:key="date" class="week-day {{item.selected ? 'week-day-selected' : ''}}" data-date="{{item.date}}" bindtap="selectWeekDay">
+        <text class="weekday-text">{{item.weekday}}</text>
+        <text class="week-day-number">{{item.day}}</text>
+        <view class="eaten-dot" wx:if="{{item.eatenCount}}"></view>
+      </view>
+    </view>
   </scroll-view>
 
   <view wx:if="{{!weekView}}">
-    <view class="intro-row"><text>{{dateLabel}}想吃什么？</text><text class="clear-link" wx:if="{{plannedCount}}" bindtap="clearDayMenu">清空当天</text></view>
+    <view class="intro-row">
+      <text>{{dateLabel}}想吃什么？</text>
+      <text class="clear-link" wx:if="{{plannedCount}}" bindtap="clearDayMenu">清空当天</text>
+    </view>
 
     <view class="meal-card" wx:for="{{meals}}" wx:key="key">
       <view class="meal-head">
@@ -40,7 +59,13 @@
       </view>
       <view wx:if="{{item.recipes.length}}" class="dish-list">
         <view class="dish-row" wx:for="{{item.recipes}}" wx:for-item="dish" wx:key="id">
-          <view class="dish-main" data-id="{{dish.id}}" bindtap="openRecipe"><view class="dish-art" style="background:{{dish.color}}">{{dish.emoji}}</view><view class="dish-info"><text class="dish-name">{{dish.name}} <text wx:if="{{dish.quantity > 1}}">×{{dish.quantity}}</text></text><text class="dish-meta">{{dish.time}} 分钟 · {{dish.category}}</text></view></view>
+          <view class="dish-main" data-id="{{dish.id}}" bindtap="openRecipe">
+            <view class="dish-art" style="background:{{dish.color}}">{{dish.emoji}}</view>
+            <view class="dish-info">
+              <view class="dish-name"><text class="dish-name-text">{{dish.name}}</text><text wx:if="{{dish.quantity > 1}}" class="dish-quantity">×{{dish.quantity}}</text></view>
+              <text class="dish-meta">{{dish.time}} 分钟 · {{dish.category}}</text>
+            </view>
+          </view>
           <view class="eaten-toggle {{dish.eaten ? 'is-eaten' : ''}}" data-meal="{{item.key}}" data-id="{{dish.id}}" catchtap="toggleEaten">{{dish.eaten ? '已吃' : '吃过了'}}</view>
           <view class="remove-dish" data-meal="{{item.key}}" data-id="{{dish.id}}" catchtap="removeRecipe">×</view>
         </view>
@@ -53,25 +78,47 @@
   <view wx:if="{{!weekView}}" class="shopping-cta" bindtap="addMenuIngredients">把今日菜单加入买菜清单　→</view>
   <view wx:if="{{!weekView}}" class="footnote">标记“吃过了”，就能在本周回顾里查看。</view>
 
-  <view wx:if="{{weekView}}" class="weekly-summary"><text class="summary-number">{{weekEatenCount}}</text><view><text class="summary-title">本周吃过的菜</text><text class="summary-caption">按日期和餐次整理 · {{weekRange}}</text></view></view>
+  <view wx:if="{{weekView}}" class="weekly-summary">
+    <text class="summary-number">{{weekEatenCount}}</text>
+    <view class="summary-copy"><text class="summary-title">本周吃过的菜</text><text class="summary-caption">按日期和餐次整理 · {{weekRange}}</text></view>
+  </view>
   <view wx:if="{{weekView && weekHistory.length}}" class="history-list">
     <view class="history-day" wx:for="{{weekHistory}}" wx:key="date">
-      <view class="history-date"><text>{{item.label}}</text><text>{{item.count}} 道</text></view>
+      <view class="history-date"><text>{{item.label}}</text><text class="history-count">{{item.count}} 道</text></view>
       <view class="history-meal" wx:for="{{item.meals}}" wx:for-item="meal" wx:key="key">
         <view class="history-meal-title"><text>{{meal.emoji}}</text><text>{{meal.title}}</text></view>
-        <view class="history-dish" wx:for="{{meal.recipes}}" wx:for-item="dish" wx:key="recipeId"><view class="history-art" style="background:{{dish.color}}">{{dish.emoji}}</view><view class="history-dish-info"><text>{{dish.name}}</text><text>{{dish.category}} · {{dish.time}} 分钟</text></view><text class="history-check">✓</text></view>
+        <view class="history-dish" wx:for="{{meal.recipes}}" wx:for-item="dish" wx:key="recipeId">
+          <view class="history-art" style="background:{{dish.color}}">{{dish.emoji}}</view>
+          <view class="history-dish-info"><text class="history-dish-name">{{dish.name}}</text><text class="history-dish-meta">{{dish.category}} · {{dish.time}} 分钟</text></view>
+          <text class="history-check">已吃</text>
+        </view>
       </view>
     </view>
   </view>
-  <view wx:if="{{weekView && !weekHistory.length}}" class="history-empty"><text class="history-empty-icon">☁</text><text>这周还没有吃饭记录</text><text class="history-empty-hint">在每日菜单里点“吃过了”，美味就会留在这里。</text></view>
+  <view wx:if="{{weekView && !weekHistory.length}}" class="history-empty">
+    <text class="history-empty-icon">🥢</text>
+    <text>这周还没有吃饭记录</text>
+    <text class="history-empty-hint">在每日菜单里点“吃过了”，美味就会留在这里。</text>
+  </view>
 
   <view wx:if="{{pickerVisible}}" class="picker-mask" catchtap="closeRecipePicker">
     <view class="picker-panel" style="height:{{pickerHeight}}vh;" catchtap="stopPropagation">
       <view class="picker-drag-area" bindtouchstart="onPickerTouchStart" catchtouchmove="onPickerTouchMove" bindtouchend="onPickerTouchEnd"><view class="picker-drag-bar"></view><text>上下拖动调整高度</text></view>
-      <view class="picker-head"><view><text class="picker-title">为{{pickerMealTitle}}选菜</text><text class="picker-hint">从家庭菜谱中挑选 · 可重复加份</text></view><text class="picker-close" bindtap="closeRecipePicker">×</text></view>
-      <view class="picker-search"><text>⌕</text><input placeholder="搜索菜名或食材" value="{{pickerKeyword}}" bindinput="onPickerSearch" /></view>
+      <view class="picker-head">
+        <view class="picker-head-copy"><text class="picker-title">为{{pickerMealTitle}}选菜</text><text class="picker-hint">从家庭菜谱中挑选 · 可重复加份</text></view>
+        <view class="picker-close" bindtap="closeRecipePicker">×</view>
+      </view>
+      <view class="picker-search"><view class="icon-search"></view><input placeholder="搜索菜名或食材" value="{{pickerKeyword}}" bindinput="onPickerSearch" /></view>
       <scroll-view scroll-y class="picker-list">
-        <view wx:for="{{availableRecipes}}" wx:key="id" class="picker-recipe {{item.selectedQuantity ? 'picker-recipe-selected' : ''}}" data-id="{{item.id}}" bindtap="chooseRecipe"><view class="picker-art" style="background:{{item.color}}">{{item.emoji}}</view><view class="picker-recipe-info"><text class="picker-recipe-name">{{item.name}}</text><text class="picker-recipe-meta">{{item.category}} · {{item.time}} 分钟</text></view><view class="picker-actions" catchtap="stopPropagation"><view wx:if="{{item.selectedQuantity}}" class="picker-stepper" data-id="{{item.id}}" bindtap="decreaseRecipe">−</view><text wx:if="{{item.selectedQuantity}}" class="picker-selected-count">已选 {{item.selectedQuantity}}</text><view class="picker-add" data-id="{{item.id}}" bindtap="chooseRecipe">{{item.selectedQuantity ? '＋' : '＋ 添加'}}</view></view></view>
+        <view wx:for="{{availableRecipes}}" wx:key="id" class="picker-recipe {{item.selectedQuantity ? 'picker-recipe-selected' : ''}}" data-id="{{item.id}}" bindtap="chooseRecipe">
+          <view class="picker-art" style="background:{{item.color}}">{{item.emoji}}</view>
+          <view class="picker-recipe-info"><text class="picker-recipe-name">{{item.name}}</text><text class="picker-recipe-meta">{{item.category}} · {{item.time}} 分钟</text></view>
+          <view class="picker-actions" catchtap="stopPropagation">
+            <view wx:if="{{item.selectedQuantity}}" class="picker-stepper" data-id="{{item.id}}" bindtap="decreaseRecipe">−</view>
+            <text wx:if="{{item.selectedQuantity}}" class="picker-selected-count">已选 {{item.selectedQuantity}}</text>
+            <view class="picker-add {{item.selectedQuantity ? 'picker-add-more' : ''}}" data-id="{{item.id}}" bindtap="chooseRecipe">{{item.selectedQuantity ? '＋' : '＋ 添加'}}</view>
+          </view>
+        </view>
         <view wx:if="{{!availableRecipes.length}}" class="picker-empty">没有可添加的菜谱</view>
       </scroll-view>
     </view>

@@ -1,12 +1,13 @@
 Component({
   data: {
     selected: 0,
+    hidden: false,
     list: [
-      { pagePath: '/pages/home/home', text: '首页', icon: '⌂' },
-      { pagePath: '/pages/recipes/recipes', text: '菜谱', icon: '▤' },
-      { pagePath: '/pages/favorites/favorites', text: '收藏', icon: '♡' },
-      { pagePath: '/pages/list/list', text: '买菜清单', icon: '☷' },
-      { pagePath: '/pages/menu/menu', text: '点菜', icon: '♨' }
+      { pagePath: '/pages/home/home', text: '首页', icon: 'home' },
+      { pagePath: '/pages/recipes/recipes', text: '菜谱', icon: 'recipes' },
+      { pagePath: '/pages/favorites/favorites', text: '收藏', icon: 'favorites' },
+      { pagePath: '/pages/list/list', text: '买菜清单', icon: 'list' },
+      { pagePath: '/pages/menu/menu', text: '点菜', icon: 'menu' }
     ]
   },
   methods: {
