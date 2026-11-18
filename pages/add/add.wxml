@@ -25,6 +25,18 @@
       <view class="field half"><text class="label">用时（分钟）</text><input class="text-input" type="number" placeholder="30" value="{{time}}" data-field="time" bindinput="onInput"/></view>
       <view class="field half"><text class="label">几人份</text><input class="text-input" type="number" placeholder="2" value="{{servings}}" data-field="servings" bindinput="onInput"/></view>
     </view>
+    <view class="row">
+      <view class="field half">
+        <text class="label">难度</text>
+        <picker mode="selector" range="{{difficulties}}" value="{{difficultyIndex}}" bindchange="onDifficulty">
+          <view class="picker-value"><text>{{difficulties[difficultyIndex]}}</text><view class="icon-chevron-down"></view></view>
+        </picker>
+      </view>
+      <view class="field half">
+        <text class="label">孩子爱吃</text>
+        <view class="switch-value"><text>{{kidFriendly ? '是' : '否'}}</text><switch checked="{{kidFriendly}}" color="#E06C3E" bindchange="onKidFriendly"/></view>
+      </view>
+    </view>
     <view class="field">
       <view class="label-row"><text class="label">食材清单</text><text class="inline-action" bindtap="addIngredient">＋ 添加食材</text></view>
       <view class="ingredient-row" wx:for="{{ingredients}}" wx:key="index">

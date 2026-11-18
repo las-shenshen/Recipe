@@ -13,6 +13,9 @@ Page({
     description: '',
     time: '',
     servings: '',
+    difficulties: ['简单', '中等', '困难'],
+    difficultyIndex: 0,
+    kidFriendly: false,
     ingredients: [{ name: '', amount: '' }],
     steps: ['']
   },
@@ -29,6 +32,10 @@ Page({
     }
     this.recipeId = recipe.id
     const categoryIndex = Math.max(0, this.data.categories.indexOf(recipe.category))
+    // 旧菜谱的难度可能不在选项里，保留原值而不是悄悄改成“简单”。
+    const difficulties = !recipe.difficulty || this.data.difficulties.indexOf(recipe.difficulty) >= 0
+      ? this.data.difficulties
+      : this.data.difficulties.concat(recipe.difficulty)
     this.setData({
       isEditing: true,
       name: recipe.name || '',
@@ -37,6 +44,9 @@ Page({
       description: recipe.description || '',
       time: String(recipe.time || ''),
       servings: String(recipe.servings || ''),
+      difficulties,
+      difficultyIndex: Math.max(0, difficulties.indexOf(recipe.difficulty)),
+      kidFriendly: Boolean(recipe.kidFriendly),
       ingredients: (recipe.ingredients || []).map(item => ({ name: item.name || '', amount: item.amount || '' })),
       steps: (recipe.steps || []).slice()
     })
@@ -52,6 +62,8 @@ Page({
     const categoryIndex = Number(e.detail.value)
     this.setData({ categoryIndex, category: this.data.categories[categoryIndex] })
   },
+  onDifficulty(e) { this.setData({ difficultyIndex: Number(e.detail.value) }) },
+  onKidFriendly(e) { this.setData({ kidFriendly: Boolean(e.detail.value) }) },
   addIngredient() { this.setData({ ingredients: this.data.ingredients.concat([{ name: '', amount: '' }]) }) },
   removeIngredient(e) {
     const index = Number(e.currentTarget.dataset.index)
@@ -102,7 +114,8 @@ Page({
       description: this.data.description.trim() || '这是一道家的味道。',
       time: Number(this.data.time) || 30,
       servings: Number(this.data.servings) || 2,
-      difficulty: oldRecipe ? oldRecipe.difficulty : '简单',
+      difficulty: this.data.difficulties[this.data.difficultyIndex] || '简单',
+      kidFriendly: this.data.kidFriendly,
       emoji: oldRecipe ? oldRecipe.emoji : emojis[recipes.length % emojis.length],
       color: oldRecipe ? oldRecipe.color : colors[recipes.length % colors.length],
       ingredients,

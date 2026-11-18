@@ -57,15 +57,27 @@ function saveUserProfile(openid, profile) {
   return profilesCollection.doc(openid).set({ data }).then(() => resolveProfileAvatars([data]).then(items => items[0]))
 }
 
-function quickLogin(event, openid) {
-  if (!openid) return Promise.reject(new Error('微信身份识别失败，请重试'))
-  if (!event.profile || !String(event.profile.nickname || '').trim() || !(event.profile.avatarFileId || event.profile.avatarUrl)) {
-    return Promise.reject(new Error('请先填写微信昵称并选择头像'))
-  }
-  return saveUserProfile(openid, event.profile).then(profile => ({
-    loggedIn: true,
-    profile: { nickname: profile.nickname, avatarUrl: profile.avatarUrl, avatarFileId: profile.avatarFileId }
-  }))
+function chunk(values, size) {
+  const chunks = []
+  for (let index = 0; index < values.length; index += size) chunks.push(values.slice(index, index + size))
+  return chunks
+}
+
+// 一次批量读取多个用户的资料并换好头像链接，返回 openid → 资料 的映射。
+function loadProfiles(openids) {
+  const ids = (openids || []).filter((id, index) => id && id !== 'system' && openids.indexOf(id) === index)
+  if (!ids.length) return Promise.resolve({})
+  return Promise.all(chunk(ids, 100).map(part => profilesCollection.where({ _id: _.in(part) }).limit(100).get()))
+    .then(results => {
+      const stored = []
+      results.forEach(result => (result.data || []).forEach(profile => stored.push(profile)))
+      return resolveProfileAvatars(stored)
+    })
+    .then(hydrated => {
+      const profiles = {}
+      hydrated.forEach(profile => { profiles[profile._id] = profile })
+      return profiles
+    })
 }
 
 function currentProfile(openid) {
@@ -78,6 +90,19 @@ function normalizeCategoryName(value) {
 
 function categoryDocumentId(name) {
   return `cat_${Buffer.from(name, 'utf8').toString('hex')}`
+}
+
+// 分类集合不在最初的建库清单里。每个容器首次处理分类请求时确保它存在；
+// 集合已存在时 createCollection 会抛错，统一忽略。
+let categoriesEnsured = false
+async function ensureCategoriesCollection() {
+  if (categoriesEnsured || typeof db.createCollection !== 'function') return
+  try {
+    await db.createCollection('recipe_categories')
+  } catch (error) {
+    // 集合已存在（或当前环境暂不支持创建），继续。
+  }
+  categoriesEnsured = true
 }
 
 function listCategories(openid) {
@@ -121,70 +146,61 @@ function loadRecipe(recipeId) {
   return recipesCollection.where({ _id: recipeId }).limit(1).get().then(result => (result.data || [])[0] || null)
 }
 
-function loadRecipeFavorites(recipeId, openid) {
+// 收藏变更后返回这道菜真实的收藏人数、最近收藏者和作者，
+// 页面可以直接使用，不必等下一次整表同步。favorite 是当前用户变更后的状态。
+function presentRecipe(recipe, openid, favorite) {
+  const recipeId = recipe._id
   return Promise.all([
     favoritesCollection.where({ recipeId }).orderBy('createdAt', 'desc').limit(8).get(),
-    favoritesCollection.where({ recipeId }).count(),
-    favoritesCollection.where({ recipeId, openid }).limit(1).get()
+    favoritesCollection.where({ recipeId }).count()
   ]).then(results => {
     const favorites = results[0].data || []
-    const count = results[1].total || favorites.length
-    const favorite = (results[2].data || []).length > 0
-    const userIds = []
-    favorites.forEach(item => {
-      if (userIds.indexOf(item.openid) < 0) userIds.push(item.openid)
+    const total = Math.max(Number(results[1].total) || 0, favorites.length)
+    return loadProfiles(favorites.map(item => item.openid).concat(recipe.authorOpenid)).then(profiles => {
+      const author = recipe.authorOpenid === 'system'
+        ? { nickname: '家庭菜谱', avatarUrl: '' }
+        : (profiles[recipe.authorOpenid] || { nickname: '家庭成员', avatarUrl: '' })
+      return Object.assign({}, cleanRecipe(recipe), {
+        id: recipeId,
+        createdAt: recipe.createdAt,
+        updatedAt: recipe.updatedAt,
+        authorName: author.nickname,
+        authorAvatar: author.avatarUrl,
+        isMine: recipe.authorOpenid === openid,
+        isCloud: true,
+        favorite,
+        favoriteCount: total,
+        favoriteUsers: favorites.map(item => {
+          const profile = profiles[item.openid] || { nickname: '家庭成员', avatarUrl: '' }
+          return { nickname: profile.nickname, avatarUrl: profile.avatarUrl }
+        })
+      })
     })
-    if (favorite && userIds.indexOf(openid) < 0) userIds.push(openid)
-    return Promise.all(userIds.map(getUserProfile)).then(profiles => ({
-      favorite,
-      favoriteCount: count,
-      favoriteUsers: profiles.map(profile => ({ nickname: profile.nickname, avatarUrl: profile.avatarUrl }))
-    }))
   })
 }
 
-function presentRecipe(recipe, openid) {
-  const authorTask = recipe.authorOpenid === 'system'
-    ? Promise.resolve({ nickname: '家庭菜谱', avatarUrl: '' })
-    : getUserProfile(recipe.authorOpenid)
-  return Promise.all([authorTask, loadRecipeFavorites(recipe._id, openid)]).then(results => {
-    const author = results[0]
-    return Object.assign({}, cleanRecipe(recipe), {
-      id: recipe._id,
-      createdAt: recipe.createdAt,
-      updatedAt: recipe.updatedAt,
-      authorName: author.nickname,
-      authorAvatar: author.avatarUrl,
-      isMine: recipe.authorOpenid === openid,
-      isCloud: true
-    }, results[1])
-  })
-}
+// 小程序端把整份菜谱列表缓存在一个本地存储键里（单键上限约 1MB），
+// 所以这里一次取回的数量设了上限，而不是无限分页。
+const MAX_LISTED_RECIPES = 200
 
 function listRecipes(openid) {
-  return recipesCollection.orderBy('updatedAt', 'desc').limit(60).get().then(async result => {
+  return recipesCollection.orderBy('updatedAt', 'desc').limit(MAX_LISTED_RECIPES).get().then(async result => {
     const recipes = result.data || []
     if (!recipes.length) return []
     const recipeIds = recipes.map(recipe => recipe._id)
-    const favoriteResult = await favoritesCollection.where({ recipeId: _.in(recipeIds) }).limit(1000).get()
+    const favoriteResults = await Promise.all(chunk(recipeIds, 100).map(ids => favoritesCollection.where({ recipeId: _.in(ids) }).limit(1000).get()))
     const favoritesByRecipe = {}
-    const openids = []
-    recipes.forEach(recipe => { if (openids.indexOf(recipe.authorOpenid) < 0) openids.push(recipe.authorOpenid) })
-    ;(favoriteResult.data || []).forEach(favorite => {
+    const openids = recipes.map(recipe => recipe.authorOpenid)
+    favoriteResults.forEach(favoriteResult => (favoriteResult.data || []).forEach(favorite => {
       if (!favoritesByRecipe[favorite.recipeId]) favoritesByRecipe[favorite.recipeId] = []
       favoritesByRecipe[favorite.recipeId].push(favorite)
-      if (openids.indexOf(favorite.openid) < 0) openids.push(favorite.openid)
-    })
-    const profileChunks = []
-    for (let index = 0; index < openids.length; index += 100) profileChunks.push(openids.slice(index, index + 100))
-    const profileResults = await Promise.all(profileChunks.map(chunk => profilesCollection.where({ _id: _.in(chunk) }).limit(100).get()))
-    const profiles = {}
-    const storedProfiles = []
-    profileResults.forEach(result => (result.data || []).forEach(profile => storedProfiles.push(profile)))
-    const hydratedProfiles = await resolveProfileAvatars(storedProfiles)
-    hydratedProfiles.forEach(profile => { profiles[profile._id] = profile })
+      openids.push(favorite.openid)
+    }))
+    const profiles = await loadProfiles(openids)
     return recipes.map(recipe => {
-      const author = profiles[recipe.authorOpenid] || { nickname: '家庭成员', avatarUrl: '' }
+      const author = recipe.authorOpenid === 'system'
+        ? { nickname: '家庭菜谱', avatarUrl: '' }
+        : (profiles[recipe.authorOpenid] || { nickname: '家庭成员', avatarUrl: '' })
       const favorites = favoritesByRecipe[recipe._id] || []
       return Object.assign({}, cleanRecipe(recipe), {
         id: recipe._id,
@@ -295,23 +311,12 @@ function toggleFavorite(event, openid) {
       ? Promise.reject(new Error('这道菜谱已不存在'))
       : Promise.resolve(actualRecipe || ensureDefaultRecipe(recipeId))
     return recipeTask.then(foundRecipe => Promise.all([saveUserProfile(openid, event.profile), favoritesCollection.where({ recipeId, openid }).limit(1).get()]).then(results => {
-      const profile = results[0]
       const existing = (results[1].data || [])[0]
       const mutation = favorite
         ? (existing ? Promise.resolve() : favoritesCollection.add({ data: { recipeId, openid, createdAt: db.serverDate() } }))
         : (existing ? favoritesCollection.doc(existing._id).remove() : Promise.resolve())
-      return mutation.then(() => Object.assign({}, cleanRecipe(foundRecipe), {
-        id: recipeId,
-        createdAt: foundRecipe.createdAt,
-        updatedAt: foundRecipe.updatedAt,
-        authorName: foundRecipe.authorOpenid === 'system' ? '家庭菜谱' : ((foundRecipe.authorOpenid === openid && profile.nickname) || '家庭成员'),
-        authorAvatar: foundRecipe.authorOpenid === openid ? profile.avatarUrl : '',
-        isMine: foundRecipe.authorOpenid === openid,
-        isCloud: true,
-        favorite,
-        favoriteCount: favorite ? 1 : 0,
-        favoriteUsers: favorite ? [{ nickname: profile.nickname, avatarUrl: profile.avatarUrl }] : []
-      }))
+      // 其他人可能也收藏了这道菜，所以收藏数和收藏者要在写入后重新读取。
+      return mutation.then(() => presentRecipe(foundRecipe, openid, favorite))
     }))
   })
 }
@@ -320,8 +325,8 @@ exports.main = async (event) => {
   const openid = cloud.getWXContext().OPENID
   try {
     let data
+    if (['listCategories', 'createCategory', 'removeCategory'].includes(event.action)) await ensureCategoriesCollection()
     if (event.action === 'listRecipes') data = { recipes: await listRecipes(openid) }
-    else if (event.action === 'quickLogin') data = await quickLogin(event, openid)
     else if (event.action === 'getProfile') data = await currentProfile(openid)
     else if (event.action === 'listCategories') data = await listCategories(openid)
     else if (event.action === 'createCategory') data = await createCategory(event, openid)

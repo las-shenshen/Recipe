@@ -18,6 +18,8 @@
 .text-input { height:88rpx; padding:0 24rpx; box-sizing:border-box; border-radius:20rpx; background:var(--fill); color:var(--ink); font-size:28rpx; }
 .picker-value { height:88rpx; padding:0 28rpx 0 24rpx; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; border-radius:20rpx; background:var(--fill); color:var(--ink); font-size:28rpx; }
 .picker-value .icon-chevron-down { color:var(--ink-3); }
+.switch-value { height:88rpx; padding:0 12rpx 0 24rpx; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; border-radius:20rpx; background:var(--fill); color:var(--ink); font-size:28rpx; }
+.switch-value switch { transform:scale(.8); transform-origin:right center; }
 .textarea-box { padding:22rpx 24rpx; border-radius:20rpx; background:var(--fill); }
 .textarea-box textarea, .step-row textarea { width:100%; min-height:44rpx; color:var(--ink); font-size:28rpx; line-height:1.5; }
 
